@@ -13,7 +13,7 @@ jobs:
 
       - name: Unzip build.zip
         run: |
-          unzip build.zip -d build
+          unzip build.zip -d .  # 解压到当前目录（根目录）
           rm build.zip
 
       - name: Remove nested .git directories
