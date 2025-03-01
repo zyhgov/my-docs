@@ -9,21 +9,17 @@ jobs:
   unzip:
     runs-on: ubuntu-latest
     steps:
-      # 1. 检出代码
       - uses: actions/checkout@v4
 
-      # 2. 解压并删除 ZIP 文件
       - name: Unzip build.zip
         run: |
           unzip build.zip -d .  # 解压到根目录
           rm build.zip
 
-      # 3. 清理嵌套的 .git 目录
       - name: Remove nested .git directories
         run: |
           find . -type d -name ".git" -exec rm -rf {} +
 
-      # 4. 提交到 gh-pages 分支
       - name: Commit to gh-pages
         run: |
           git config --global user.name "GitHub Actions"
@@ -33,11 +29,12 @@ jobs:
           git commit -m "Deploy build files" || exit 0
           git push origin gh-pages --force
 
-      # 5. 删除 main 分支中的 build.zip
+      # 修改后的删除步骤：使用 git 命令代替第三方动作
       - name: Delete build.zip from main
-        uses: actions/delete-file@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          file-path: build.zip
-          commit-message: "Delete build.zip after deployment"
-          branch: main
+        run: |
+          git checkout main
+          git rm build.zip || echo "No build.zip to delete"
+          git commit -m "Delete build.zip after deployment"
+          git push origin main --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
