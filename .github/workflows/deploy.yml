@@ -1,49 +1,31 @@
-name: Unzip Build
+name: Deploy to GitHub Pages
 
 on:
   push:
-    paths:
-      - 'build.zip'
+    branches:
+      - main
 
 jobs:
-  unzip:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      # 1. 检出代码（初始化 Git 仓库）
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      # 2. 解压并删除 ZIP 文件
-      - name: Unzip build.zip
-        run: |
-          unzip build.zip -d .  # 解压到根目录
-          rm build.zip
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      # 3. 清理嵌套的 .git 目录
-      - name: Remove nested .git directories
-        run: |
-          find . -type d -name ".git" -exec rm -rf {} +
+      - name: Install dependencies
+        run: npm install
 
-      # 4. 提交到 gh-pages 分支
-      - name: Commit to gh-pages
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          # 强制切换到 gh-pages 分支并推送
-          git checkout -B gh-pages
-          git add .
-          git commit -m "Deploy build files" || exit 0
-          git push origin gh-pages --force
+      - name: Build with Starlight
+        run: npm run build
 
-      # 5. 切换回 main 分支并删除 build.zip
-      - name: Switch back to main branch
-        run: |
-          git checkout main
-          git pull origin main  # 确保本地分支最新
-
-      - name: Delete build.zip from main
-        run: |
-          git rm build.zip || echo "No build.zip to delete"
-          git commit -m "Delete build.zip after deployment"
-          git push origin main --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
