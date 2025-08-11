@@ -2,10 +2,8 @@
 name: Deploy to GitHub Pages
 
 on:
-  # 监听 push 到 main 分支的事件
   push:
-    branches: ["main"]
-  # 允许你从 GitHub Actions 页面手动触发此工作流
+    branches: ["gh-pages"]
   workflow_dispatch:
 
 permissions:
@@ -54,4 +52,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
