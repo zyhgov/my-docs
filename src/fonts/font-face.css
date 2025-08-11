@@ -1,21 +1,22 @@
+/* src/fonts/font-face.css */
+
 @font-face {
-  font-family: 'OpenAISans-Medium';
-  src: url('./OpenAISans-Medium.woff2') format('woff2');
-  font-weight: normal;
+  font-family: 'OpenAISans';
   font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'OpenAISans-Regular';
+  font-weight: 400; /* Regular */
   src: url('./OpenAISans-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
 }
+
 @font-face {
-  font-family: 'OpenAISans-Semibold';
-  src: url('./OpenAISans-Semibold.woff2') format('woff2');
-  font-weight: normal;
+  font-family: 'OpenAISans';
   font-style: normal;
-  font-display: swap;
+  font-weight: 500; /* Medium */
+  src: url('./OpenAISans-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'OpenAISans';
+  font-style: normal;
+  font-weight: 600; /* Semibold */
+  src: url('./OpenAISans-Semibold.woff2') format('woff2');
 }

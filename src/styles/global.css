@@ -1,1 +1,16 @@
+@import './fonts/font-face.css';
+
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, a, button {
+  font-family: 'OpenAISans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-weight: 400;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+}
 @import "tailwindcss";
