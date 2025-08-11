@@ -1,58 +1,53 @@
 # .github/workflows/deploy.yml
-name: Deploy to GitHub Pages
+name: Force Deploy to GitHub Pages (gh-pages branch)
 
 on:
+  # 当推送到 main 分支时触发
   push:
-    branches: ["gh-pages"]
+    branches: [ "main" ]
+  # 允许手动在 Actions 页面触发
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      # 1. 检出代码
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
+      # 2. 安装 Node.js 环境
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
 
+      # 3. 安装项目依赖
       - name: Install dependencies
-        run: npm ci
+        run: npm ci # 使用 ci 确保依赖版本一致
 
+      # 4. 使用 Starlight 构建静态网站
       - name: Build with Starlight
         run: |
           npm run build
+          # 添加 .nojekyll 文件，确保 GitHub Pages 正确处理下划线文件/文件夹
           touch dist/.nojekyll
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      # 5. 部署到 gh-pages 分支
+      # !! 关键步骤 !!
+      # 这个 Action 会强制将 dist 目录的内容推送到 gh-pages 分支
+      - name: Deploy to GitHub Pages (via gh-pages branch)
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: ./dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: peaceiris/actions-gh-pages@v4
-        with:
+          # 使用 GitHub 提供的默认 token
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          # 指定要部署的目录（Starlight 默认输出到 dist）
           publish_dir: ./dist
+          # 强制部署，忽略历史记录
+          force_orphan: true
+          # (可选) 设置提交用户信息
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          # (可选) 自定义提交信息
+          commit_message: 'Deploy site via GitHub Actions'
